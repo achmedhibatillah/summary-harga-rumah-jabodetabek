@@ -66,4 +66,4 @@ Visualization was created using the `tmap` package in R and shapefiles obtained 
 ## Contact  
 Achmed Hibatillah  
 GitHub: [@achmedhibatillah](https://github.com/achmedhibatillah)  
-Email: achmedhibatillah@example.com  
+Email: contact@achmedhibatillah.com  
