@@ -6,8 +6,7 @@ This project aims to analyze and visualize housing prices in the Greater Jakarta
 ---
 
 ## Data Source  
-- Dataset: [Housing Prices in Jabodetabek - Kaggle](https://www.kaggle.com/datasets/nafisbarizki/daftar-harga-rumah-jabodetabek)  
-- Repository: [github.com/achmedhibatillah/summary-harga-rumah-jabodetabek](https://github.com/achmedhibatillah/summary-harga-rumah-jabodetabek)
+- Dataset: [Housing Prices in Jabodetabek - Kaggle](https://www.kaggle.com/datasets/nafisbarizki/daftar-harga-rumah-jabodetabek)
 
 ---
 
@@ -61,12 +60,6 @@ Visualization was created using the `tmap` package in R and shapefiles obtained 
 ## Dependencies  
 - R (latest version)  
 - R packages: `dplyr`, `stringr`, `sf`, `tmap`, `geodata`, `scales`
-
----
-
-## References  
-- Dataset: https://www.kaggle.com/datasets/nafisbarizki/daftar-harga-rumah-jabodetabek  
-- Repository: https://github.com/achmedhibatillah/summary-harga-rumah-jabodetabek  
 
 ---
 
