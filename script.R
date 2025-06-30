@@ -3,7 +3,7 @@
 cat("\014")
 
 #install.packages("rvest")
-install.packages("tidyr")
+#install.packages("tidyr")
 #install.packages("readr")
 #install.packages("dplyr")
 #install.packages("stringr")
@@ -95,8 +95,7 @@ parsed_df <- df %>%
   )
 
 head(parsed_df %>% 
-       select(title, price_in_rp, jumlah_lantai, luas_tanah, luas_total_m2, cluster, tipe_rumah, lokasi_khusus,
-              status_kondisi, tipe_posisi, furnished, akses_tol, akses_stasiun, keunggulan_lain), 10)
+       select(title, price_in_rp, jumlah_lantai, luas_tanah, luas_total_m2, cluster, tipe_rumah, lokasi_khusus, status_kondisi, tipe_posisi, furnished, akses_tol, akses_stasiun, keunggulan_lain), 10)
 
 write_csv(parsed_df, "parsed_file.csv")
 
@@ -225,6 +224,29 @@ print(data_merged)
 correlation <- cor(data_merged$mean_price, data_merged$count_office, use = "complete.obs")
 print(paste("Korelasi antara mean_price dan count_office:", correlation))
 
-# 8. REGRESI LINEAR
+# REGRESI LINEAR
 model <- lm(mean_price ~ count_office, data = data_merged)
 summary(model)
+
+# LOG-TRANSFORMASI VARIABEL
+data_merged <- data_merged %>%
+  mutate(log_mean_price = log(mean_price),
+         log_count_office = log(count_office))
+
+cor(data_merged$log_mean_price, data_merged$log_count_office)
+summary(lm(log_mean_price ~ log_count_office, data = data_merged))
+
+ggplot(data_merged, aes(x = count_office, y = mean_price)) +
+  geom_point(size=4) +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Hubungan Jumlah Kantor dan Harga Rumah Rata-rata",
+       x = "Jumlah Kantor", y = "Harga Rata-rata") +
+  theme_minimal()
+
+ggplot(data_merged, aes(x = count_office, y = mean_price)) +
+  geom_point(size=4) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  scale_y_log10(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
+  scale_x_log10() +
+  labs(title = "Log-Scale: Harga vs Jumlah Kantor", x = "Log Jumlah Kantor", y = "Log Harga Rata-rata") +
+  theme_minimal()
