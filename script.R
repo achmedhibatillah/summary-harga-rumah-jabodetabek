@@ -3,6 +3,7 @@
 cat("\014")
 
 #install.packages("rvest")
+install.packages("tidyr")
 #install.packages("readr")
 #install.packages("dplyr")
 #install.packages("stringr")
@@ -15,6 +16,7 @@ cat("\014")
 #install.packages("scales")
 
 library(readr)
+library(tidyr)
 library(dplyr)
 library(stringr)
 library(ggplot2)
@@ -102,7 +104,8 @@ write_csv(parsed_df, "parsed_file.csv")
 df <- read_csv("parsed_file.csv")
 
 df_clean <- df %>%
-  filter(!is.na(price_in_rp))
+  filter(!is.na(price_in_rp)) %>%
+  filter(str_detect(tolower(city), "jakarta"))
 
 # SUMMARY BY DISTRICT
 summary_by_district <- df_clean %>%
@@ -150,10 +153,6 @@ indo_sf <- indo_sf %>%
   mutate(
     city_name = tolower(NAME_2),
     city_group = case_when(
-      str_detect(city_name, "bekasi") ~ "bekasi",
-      str_detect(city_name, "bogor") ~ "bogor",
-      str_detect(city_name, "tangerang") ~ "tangerang",
-      str_detect(city_name, "depok") ~ "depok",
       str_detect(city_name, "jakarta barat") ~ "jakarta barat",
       str_detect(city_name, "jakarta pusat") ~ "jakarta pusat",
       str_detect(city_name, "jakarta selatan") ~ "jakarta selatan",
@@ -193,9 +192,39 @@ tm_shape(map_data) +
       labels = range_labels,
       values = "brewer.yl_or_rd"
     ),
-    fill.legend = tm_legend(title = "Rata-rata Harga Rumah Area Jabodetabek")
+    fill.legend = tm_legend(title = "Rata-rata Harga Rumah DKI Jakarta")
   ) +
   tm_text("city_group", size = 0.7, col = "black") +
-  tm_title("Harga Rata-rata Rumah di Area Jabodetabek") +
+  tm_title("Harga Rata-rata Rumah di DKI Jakarta") +
   tm_layout(legend.outside = TRUE)
 
+# MENENTUKAN HUBUNGAN
+# INDEPENDEN: RATA-RATA HARGA RUMAH (mean_price)
+# DEPENDEN: JUMLAH KANTOR (count_office)
+lokasi <- read_csv("location.csv")
+
+lokasi_long <- lokasi %>%
+  pivot_longer(
+    cols = -lokasi,
+    names_to = "city_raw",
+    values_to = "count_office"
+  ) %>%
+  filter(lokasi == "kantor") %>%
+  select(-lokasi)
+
+lokasi_long <- lokasi_long %>%
+  mutate(city = tolower(city_raw)) %>%
+  mutate(city = gsub(" ", " ", city))
+
+data_merged <- summary_by_city %>%
+  mutate(city = tolower(city)) %>%
+  left_join(lokasi_long, by = "city")
+print(data_merged)
+
+# KORELASI mean_price dan count_office
+correlation <- cor(data_merged$mean_price, data_merged$count_office, use = "complete.obs")
+print(paste("Korelasi antara mean_price dan count_office:", correlation))
+
+# 8. REGRESI LINEAR
+model <- lm(mean_price ~ count_office, data = data_merged)
+summary(model)
